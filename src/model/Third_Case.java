@@ -1,75 +1,52 @@
 package model;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import Service.Delivery;
+import Service.Match;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
-import java.util.*;
 
 public class Third_Case {
-    static ArrayList<String> idList = new ArrayList<String >();
-    public static void readMatches(String matchesCSV) {
-        try {
-            String line = "";
-            BufferedReader br = new BufferedReader(new FileReader(matchesCSV));
-            int count = 0;
-
-            while((line = br.readLine()) != null)
+    public static void findExtraRunsConcededInYear2016(List<Match> matchesList, List<Delivery> deliveriesList) {
+        ArrayList<String> idList = new ArrayList<String >();
+        for(Match match : matchesList)
+        {
+            String season = match.getSeason();
+            String id = match.getId();
+            if(season.equals("2016"))
             {
-                String[] row = line.split(",");
-                String season = row[1];
-                String id = row[0];
-                //map.remove("season");
-
-                if(season.equals("2016"))
-                {
-                    idList.add(id);
-                }
+                idList.add(id);
             }
-            br.close();
-        } catch(IOException ioe) {
-            ioe.printStackTrace();
         }
-    }
-    public static void readDeliveries(String deliveriesCSV) {
-        try{
-
-            String line = "";
-            BufferedReader br = new BufferedReader(new FileReader(deliveriesCSV));
-            TreeMap<String,Integer> map = new TreeMap<>();
-            while((line = br.readLine()) != null)
+        TreeMap<String,Integer> extraRunsConceded = new TreeMap<>();
+        for(Delivery delivery : deliveriesList)
+        {
+            for(String ids : idList)
             {
-                String[] rowDelivery = line.split(",");
-                for(String ids : idList)
+                if(ids.equals(delivery.getId()))
                 {
-                    if(ids.equals(rowDelivery[0]))
+                    String team = delivery.getBowling_team();
+                    int totalExtraRuns = 0;
+                    int extraRuns = Integer.parseInt(delivery.getExtra_runs());
+                    extraRunsConceded.remove("bowling_team");
+
+                    if(extraRunsConceded.containsKey(team))
                     {
-                        String team = rowDelivery[3];
-                        int totalExtraRuns = 0;
-                        int extraRuns = Integer.parseInt(rowDelivery[16]);
-                        map.remove("bowling_team");
-
-                        if(map.containsKey(team))
-                        {
-                            totalExtraRuns = map.get(team);
-                            totalExtraRuns += extraRuns;
-                        }
-                        else
-                        {
-                            totalExtraRuns = extraRuns;
-                        }
-                        map.put(team,totalExtraRuns);
+                        totalExtraRuns = extraRunsConceded.get(team);
+                        totalExtraRuns += extraRuns;
                     }
+                    else
+                    {
+                        totalExtraRuns = extraRuns;
+                    }
+                    extraRunsConceded.put(team,totalExtraRuns);
                 }
             }
-            for (Map.Entry m : map.entrySet())
-            {
-                System.out.println(m.getKey() + " is " + m.getValue());
-            }
-            br.close();
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
+        }
+        for (Map.Entry extraRuns : extraRunsConceded.entrySet())
+        {
+            System.out.println(extraRuns.getKey() + " is " + extraRuns.getValue());
         }
     }
-
 }

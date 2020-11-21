@@ -1,50 +1,38 @@
 package model;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import Service.Match;
+import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
-import java.util.*;
 
 public class Second_Case {
-
-    public static void readMatches(String csvFile) {
-        try {
-            String line = "";
-            BufferedReader br = new BufferedReader(new FileReader(csvFile));
-            TreeMap<String,Integer> map = new TreeMap<String, Integer>();
-            int count = 0;
-            while((line = br.readLine()) != null)
+    public static void findTheNumberOfMatchesWon(List<Match> matchesList) {
+        TreeMap<String,Integer> noOfMatchesWon = new TreeMap<String, Integer>();
+        int count = 0;
+        for(Match match : matchesList)
+        {
+            String team = match.getTeam1();
+            String winner = match.getWinner();
+            noOfMatchesWon.remove("team1");
+            if(noOfMatchesWon.containsKey(team))
             {
-                String[] row = line.split(",");
-                String team = row[4];
-                String winner = row[10];
-                map.remove("team1");
-
-                if(map.containsKey(team))
+                count = noOfMatchesWon.get(team);
+                if(team.equals(winner))
                 {
-                    count = map.get(team);
-                    if(team.equals(winner)) {
-                        count += 1;
-                    }
+                    count += 1;
                 }
-                else{
-                    if(team.equals(winner)) {
-                        count = 1;
-                    }
+            }
+            else{
+                if(team.equals(winner))
+                {
+                    count = 1;
                 }
-
-                map.put(team,count);
             }
-
-            for (Map.Entry m : map.entrySet())
-            {
-                System.out.println(m.getKey() + " " + m.getValue());
-            }
-            br.close();
-        } catch(IOException ioe) {
-            ioe.printStackTrace();
+            noOfMatchesWon.put(team,count);
+        }
+        for (Map.Entry matchesPlayed : noOfMatchesWon.entrySet())
+        {
+            System.out.println("'" + matchesPlayed.getKey() + "'" + " won number of matches : " + matchesPlayed.getValue());
         }
     }
 }
